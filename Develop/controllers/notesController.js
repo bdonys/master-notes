@@ -1,19 +1,26 @@
 const path = require('path');
 const notes = require('../db/db.json');
 const fs = require('fs/promises');
+const { v4: uuid } = require('uuid');
 
 const getNotes = (req, res) => {
     res.json(notes);
 };
 
 const postNotes = async (req, res) => {
+    const newNote = {
+        id: uuid(),
+        title: req.body.title,
+        text: req.body.text
+    }
+
     const notesDb = JSON.parse(JSON.stringify(notes));
-    notesDb.push(req.body);
+    notesDb.push(newNote);
 
     try {
         const filePath = path.join(__dirname, '../db/db.json');
         await fs.writeFile(filePath, JSON.stringify(notesDb, null, 2));
-        res.json(req.body);
+        res.json(newNote);
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err });
@@ -29,7 +36,8 @@ const deleteNotes = async (req, res) => {
         notesDb.splice(noteIndex, 1);
     
         try {
-            await fs.writeFile('../db/db.json', JSON.stringify(notesDb, null, 2));
+            const filePath = path.join(__dirname, '../db/db.json');
+            await fs.writeFile(filePath, JSON.stringify(notesDb, null, 2));
             res.json({ message: 'Note deleted' });
         } catch (err) {
             console.error(err);
