@@ -12,8 +12,6 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/favicon.ico', (req, res) => res.status(204));
-
 
 app.use(routes);
 
